@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-**Centurion** is a comprehensive educational project that builds a complete computer system from logic gates to a web browser. The project spans **12 weeks** and takes you from understanding FPGAs and SystemVerilog through building a RISC-V processor, C compiler, Unix-like operating system, TCP/IP networking stack, and finally deploying everything to custom hardware.
+**Centurion** is a comprehensive educational project that builds a complete computer system from logic gates to a web browser. The project spans **12 total units** and takes you from understanding FPGAs and SystemVerilog through building a RISC-V processor, C compiler, Unix-like operating system, TCP/IP networking stack, and finally deploying everything to custom hardware.
 
 ```
 PROJECT STACK (Bottom to Top)
@@ -52,7 +52,7 @@ PROJECT STACK (Bottom to Top)
 
 ### Section 1: Intro — Cheating Our Way Past the Transistor
 
-**Duration:** 0.5 weeks  
+**Duration:** 0.5  
 **Key Concept:** Accept transistors as our atomic primitive; build everything above them
 
 #### What You Learn
@@ -68,10 +68,9 @@ A 4-input LUT can implement ANY 4-input boolean function by storing a 16-entry t
 ```
 centurion/
 ├── rtl/              # SystemVerilog source (core, soc, peripherals)
-├── tb/               # cocotb testbenches
+├── sim/               # cocotb testbenches
 ├── tools/            # assembler, linker, compiler
 ├── sw/               # bootrom, bootloader, libc, kernel, user programs
-├── sim/              # simulation scripts
 └── synth/            # synthesis scripts
 ```
 
@@ -82,7 +81,7 @@ centurion/
 
 ### Section 2: Bringup — What Language is Hardware Coded In?
 
-**Duration:** 0.5 weeks  
+**Duration:** 0.5   
 **Key Concept:** Learn SystemVerilog through practical peripherals
 
 #### Projects
@@ -104,7 +103,7 @@ centurion/
 #### Key Files
 - `rtl/peripherals/led_blinker.sv`
 - `rtl/peripherals/uart_tx.sv`, `uart_rx.sv`, `uart_top.sv`
-- `tb/test_led_blinker.py`, `tb/test_uart.py`
+- `sim/test_led_blinker.py`, `sim/test_uart.py`
 
 #### Why It Matters
 UART is the primary debug interface for all future development. Every section relies on UART for console output and initial program loading.
@@ -113,7 +112,7 @@ UART is the primary debug interface for all future development. Every section re
 
 ### Section 3: Processor — What is a Processor Anyway?
 
-**Duration:** 3 weeks  
+**Duration:** 3   
 **Key Concept:** Build a complete RISC-V RV32I processor from scratch
 
 #### Projects
@@ -124,8 +123,11 @@ UART is the primary debug interface for all future development. Every section re
 - Output: raw binary or ELF format
 - Pipeline: Lexer → Parser → Encoder → Output
 
-**2. 5-Stage RISC-V CPU** (SystemVerilog, ~1500 lines)
+**2. 5-Stage RISC-V CPU** (SystemVerilog, ~2000 lines)
 - Classic pipeline: Fetch → Decode → Execute → Memory → Writeback
+- Cache hierarchy: 16KB I-Cache + 16KB D-Cache (direct-mapped, 64-byte lines)
+- Memory controller: Arbitrates cache requests, handles burst transfers (16 words)
+- Main memory: 1MB total (Boot ROM 64KB, Program 448KB, Data RAM 512KB)
 - Hazard handling: forwarding for data hazards, stalling for load-use
 - Branch resolution in Execute stage (2-cycle penalty if taken)
 
@@ -155,6 +157,7 @@ UART is the primary debug interface for all future development. Every section re
 #### Key Files
 - `tools/assembler/riscv_asm.py`, `lexer.py`, `parser.py`, `encoder.py`
 - `rtl/core/fetch.sv`, `decode.sv`, `execute.sv`, `memory.sv`, `writeback.sv`
+- `rtl/core/icache.sv`, `dcache.sv`, `mem_controller.sv`, `memory_model.sv`
 - `rtl/core/hazard_unit.sv`, `register_file.sv`, `alu.sv`
 - `sw/bootrom/bootrom.s`
 
@@ -162,7 +165,7 @@ UART is the primary debug interface for all future development. Every section re
 
 ### Section 4: Compiler — A "High" Level Language
 
-**Duration:** 3 weeks  
+**Duration:** 3   
 **Key Concept:** Enable C programming on our custom hardware
 
 #### Projects
@@ -215,7 +218,7 @@ NOT supported: float/double, union, enum, switch, goto,
 
 ### Section 5: Operating System — Software We Take for Granted
 
-**Duration:** 3 weeks  
+**Duration:** 3   
 **Key Concept:** Build a Unix-like OS with virtual memory and processes
 
 #### Projects
@@ -385,11 +388,11 @@ Server:  CLOSED → LISTEN → SYN_RCVD → ESTABLISHED → CLOSE_WAIT → LAST_
 | Component | Language | Lines |
 |-----------|----------|-------|
 | LED Blinker | SystemVerilog | ~50 |
-| UART | SystemVerilog | ~200 |
-| RISC-V CPU | SystemVerilog | ~1500 |
+| UART | Syst+ Caches | SystemVerilog | ~2000 |
 | MMU | SystemVerilog | ~1000 |
 | SD Controller | SystemVerilog | ~150 |
 | Ethernet MAC | SystemVerilog | ~200 |
+| **Total Hardware** | **SystemVerilog** | **~36
 | **Total Hardware** | **SystemVerilog** | **~3100** |
 | Assembler | Python | ~500 |
 | Linker | Python | ~300 |
@@ -403,7 +406,7 @@ Server:  CLOSED → LISTEN → SYN_RCVD → ESTABLISHED → CLOSE_WAIT → LAST_
 | User Programs | C | ~800 |
 | JTAG Firmware | C | ~200 |
 | **Total Software** | **Mixed** | **~8140** |
-
+7
 **Grand Total: ~11,240 lines** (excluding tests and scripts)
 
 ---
@@ -441,7 +444,7 @@ Every section depends on all previous sections. The UART from Section 2 remains 
 | Section | Hardware Output | Software Output | Capability Gained |
 |---------|-----------------|-----------------|-------------------|
 | 1 | — | Dev environment | Can simulate SystemVerilog |
-| 2 | LED blinker, UART | Tests | Can blink LED, send/receive serial |
+| 2 | LED blinke, I-Cache, D-Cache, Memory Controller | Assembler, bootrom | Can execute machine code with cachingrial |
 | 3 | RISC-V CPU | Assembler, bootrom | Can execute machine code |
 | 4 | Ethernet MAC | Compiler, linker, libc, bootloader | Can compile and run C programs |
 | 5 | MMU, SD controller | Kernel, filesystem, shell | Can run multiple processes with isolation |
